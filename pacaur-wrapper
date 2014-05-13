@@ -1,0 +1,73 @@
+#!/usr/bin/env python2.7
+from subprocess import Popen, PIPE
+import sys, re, os
+import textwrap
+class cl:
+    D = '\033[0m' #default color
+    R = '\033[91m' #red
+    Y = '\033[93m' #yellow
+    B = '\033[94m' #blue
+
+def printl(str,indent):
+    print(str)
+
+rows, columns = os.popen('stty size', 'r').read().split()
+args = sys.argv
+args[0]='pacaur'
+pkgnames=[]
+if len(args)>1 and args[1]=="-Ss":
+    #wrap around pacaur
+
+    p = Popen(args,stdin=PIPE, stdout=PIPE, bufsize=1)
+    lnctr = 0
+    num = 0
+    for line in p.stdout:
+        line = line.lstrip()
+        origline=line #backup line
+        #colorize search term, case insensitive
+        index = line.lower().find(args[2].lower())
+        if index>0:
+            line = line[:index] + cl.Y + line[index:]
+            l=len(args[2])+len(cl.Y)
+            line = line[:index+l] + cl.D + line[index+l:]
+        #colorize out-of-date flag
+        line.replace("<!>",cl.R+"<!>"+cl.D), 
+        if lnctr % 2 == 0: #this is the package line
+            #fetch package name
+            pkgnames.append(origline.split(' ')[0])
+            print cl.B+"["+str(num)+"]"+cl.D,
+            print line,
+            num=num+1
+        else: # this is the description
+            indent = len(str(num))+3
+            for ln in textwrap.wrap(line, int(columns)-indent):
+                #print each wrapped line, with dynamic whitespaces
+                print ' '*indent + ln
+        lnctr=lnctr+1
+
+    if lnctr == 0:
+        #no packages found
+        exit(1)
+
+    selection=raw_input(":: Packagenumber? [0] ")
+    if len(selection)==0:
+        selection=0
+    else:
+        selection=int(selection)
+    while selection < 0 or selection >= num:
+        selection=int(raw_input(":: Range is 0 to "+str(num-1)+"  "))
+
+    inargs=raw_input(":: pacaur args [-S]: ")
+    if len(inargs)==0:
+        inargs='-S'
+    #workaround: remove repository identifiers, since
+    #pacaur does not always understand them
+    pkgname = pkgnames[int(selection)].split("/")[1]
+    newargs=['pacaur',inargs, pkgname]
+    p = Popen(newargs,bufsize=1)
+    p.wait()
+
+else:
+    #simply pass arguments to pacaur:
+    p = Popen(args,bufsize=1)
+    p.wait()
