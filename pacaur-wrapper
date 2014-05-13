@@ -60,9 +60,7 @@ if len(args)>1 and args[1]=="-Ss":
     inargs=raw_input(":: pacaur args [-S]: ")
     if len(inargs)==0:
         inargs='-S'
-    #workaround: remove repository identifiers, since
-    #pacaur does not always understand them
-    pkgname = pkgnames[int(selection)].split("/")[1]
+    pkgname = pkgnames[int(selection)]
     newargs=['pacaur',inargs, pkgname]
     p = Popen(newargs,bufsize=1)
     p.wait()
