@@ -8,9 +8,6 @@ class cl:
     Y = '\033[93m' #yellow
     B = '\033[94m' #blue
 
-def printl(str,indent):
-    print(str)
-
 try:
     rows, columns = os.popen('stty size', 'r').read().split()
     args = sys.argv
