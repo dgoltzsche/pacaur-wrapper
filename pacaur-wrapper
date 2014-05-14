@@ -95,9 +95,13 @@ try:
 
         argpkgnames=''
         for i in ilist:
-            argpkgnames += pkgnames[i]+' '
+            #workaround: remove repository identifiers, since
+            #pacaur does not always understand them
+            argpkgnames = pkgnames[i].split("/")[1]+' '
 
-        newargs=['pacaur',inargs, argpkgnames]
+            #argpkgnames += pkgnames[i]+' '
+
+        newargs=['pacaur',inargs, argpkgnames.strip()]
         p = Popen(newargs,bufsize=1)
         p.wait()
 
