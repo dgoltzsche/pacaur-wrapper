@@ -9,6 +9,27 @@ class cl:
     Y = '\033[93m' #light yellow
     B = '\033[94m' #light blue
 
+#is called on user abort
+def user_abort():
+    print "\nuser interrupt"
+    exit(0);
+
+#parses the input string for numbers
+#possible formats: 1  1,3,7  2-7
+def parse(string):
+    if '-' in string:
+        #try range
+        a,b = re.match('^[0-9]+-[0-9]+$',string).group().split('-')
+        ret = []
+        integerlist = range(int(a),int(b)+1)
+    else:
+        #try comma seperated list (special case: one integer)
+        stringlist = re.match('^([0-9]+(,[0-9]+)*)?$',string).group().split(',')
+        integerlist = map(int,stringlist)
+
+    return integerlist
+
+
 #colorizes the substring in string with color color
 #the search is case-insensitive
 def colorize(string,sub,color):
@@ -58,26 +79,47 @@ try:
             #no packages found
             exit(1)
 
-        selection=raw_input(":: Packagenumber? [0] ")
-        if len(selection)==0:
-            selection=0
-        else:
-            selection=int(selection)
-        while selection < 0 or selection >= num:
-            selection=int(raw_input(":: Range is 0 to "+str(num-1)+"  "))
+        ilist = None
+        while ilist is None:
+            try:
+                ilist=parse(raw_input(":: Packagenumber(s): "));
+                #range check TODO
+            except KeyboardInterrupt:
+                user_abort()
+            except:
+                pass
 
-        inargs=raw_input(":: pacaur args [-S]: ")
+        inargs=raw_input(":: Pacaur arguments [-S]: ")
         if len(inargs)==0:
             inargs='-S'
-        pkgname = pkgnames[int(selection)]
-        newargs=['pacaur',inargs, pkgname]
+
+        argpkgnames=''
+        for i in ilist:
+            argpkgnames += pkgnames[i]+' '
+
+        newargs=['pacaur',inargs, argpkgnames]
         p = Popen(newargs,bufsize=1)
         p.wait()
 
+    elif args[1] == '--help' or args[1] == '-h':
+        print '########pacaur-wrapper help########'
+        print 'usage: use the same arguments as in pacaur'
+        print 'overlayed operations:'
+        print '   -Ss              sync and search in  repositories'
+        print '                    inputs after search:'
+        print '                        -packagenumber0'
+        print '                            non-negative numbers: 1'
+        print '                            comma-seperated numbers: 1,3,7'
+        print '                            ranges: 2-7'
+        print '                        -pacaur arguments, default -S'
+        print '                            see pacaur-help below'
+
+        print '############pacaur help############'
+        p = Popen(args,bufsize=1)
+        p.wait()
     else:
         #simply pass arguments to pacaur:
         p = Popen(args,bufsize=1)
         p.wait()
 except KeyboardInterrupt:
-    print "\nuser abort"
-    exit(0)
+    user_abort()
