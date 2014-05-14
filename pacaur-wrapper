@@ -8,6 +8,18 @@ class cl:
     Y = '\033[93m' #yellow
     B = '\033[94m' #blue
 
+#colorizes the substring in string with color color
+#the search is case-insensitive
+def colorize(string,sub,color):
+    index = string.lower().find(sub.lower())
+    if index>0:
+        #insert defined color string
+        string = string[:index] + color + string[index:]
+        #insert default color string
+        length=len(sub)+len(color)
+        string = string[:index+length] + cl.D + string[index+length:]
+    return string
+
 try:
     rows, columns = os.popen('stty size', 'r').read().split()
     args = sys.argv
@@ -23,13 +35,9 @@ try:
             line = line.lstrip()
             origline=line #backup line
             #colorize search term, case insensitive
-            index = line.lower().find(args[2].lower())
-            if index>0:
-                line = line[:index] + cl.Y + line[index:]
-                l=len(args[2])+len(cl.Y)
-                line = line[:index+l] + cl.D + line[index+l:]
+            line = colorize(line,args[2],cl.Y)
             #colorize out-of-date flag
-            line.replace("<!>",cl.R+"<!>"+cl.D), 
+            line = colorize(line,'<!>',cl.D)
             if lnctr % 2 == 0: #this is the package line
                 #fetch package name
                 pkgnames.append(origline.split(' ')[0])
