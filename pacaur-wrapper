@@ -101,7 +101,7 @@ try:
         p = Popen(newargs,bufsize=1)
         p.wait()
 
-    elif args[1] == '--help' or args[1] == '-h':
+    elif len(args)>1 and (args[1] == '--help' or args[1] == '-h'):
         print '########pacaur-wrapper help########'
         print 'usage: use the same arguments as in pacaur'
         print 'overlayed operations:'
