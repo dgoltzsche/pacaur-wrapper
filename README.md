@@ -7,4 +7,4 @@ pacaur-wrapper is a python-wrapper for [pacaur](https://github.com/Spyhawk/pacau
 *	colorful highlighting: search term and out-of-date-flag
 
 **Usage**
-use the same options as in pacman and pacaur
+*	use the same options as in pacman and pacaur
