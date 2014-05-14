@@ -42,88 +42,91 @@ def colorize(string,sub,color):
         string = string[:index+length] + cl.D + string[index+length:]
     return string
 
-try:
-    rows, columns = os.popen('stty size', 'r').read().split()
-    args = sys.argv
-    args[0]='pacaur'
-    pkgnames=[]
-    if len(args)>2 and args[1]=="-Ss":
-        #wrap around pacaur
+def main():
+    try:
+        rows, columns = os.popen('stty size', 'r').read().split()
+        args = sys.argv
+        args[0]='pacaur'
+        pkgnames=[]
+        if len(args)>2 and args[1]=="-Ss":
+            #wrap around pacaur
 
-        p = Popen(args,stdin=PIPE, stdout=PIPE, bufsize=1)
-        lnctr = 0
-        num = 0
-        for line in p.stdout:
-            line = line.lstrip()
-            origline=line #backup line
-            #colorize search term, case insensitive
-            line = colorize(line,args[2],cl.Y)
-            #colorize out-of-date flag
-            line = colorize(line,'<!>',cl.D)
-            #colorize '[installed]' flag
-            line = colorize(line,'[installed]',cl.G)
-            if lnctr % 2 == 0: #this is the package line
-                #fetch package name
-                pkgnames.append(origline.split(' ')[0])
-                print cl.B+"["+str(num)+"]"+cl.D,
-                print line,
-                num=num+1
-            else: # this is the description
-                indent = len(str(num))+3
-                for ln in textwrap.wrap(line, int(columns)-indent):
-                    #print each wrapped line, with dynamic whitespaces
-                    print ' '*indent + ln
-            lnctr=lnctr+1
+            p = Popen(args,stdin=PIPE, stdout=PIPE, bufsize=1)
+            lnctr = 0
+            num = 0
+            for line in p.stdout:
+                line = line.lstrip()
+                origline=line #backup line
+                #colorize search term, case insensitive
+                line = colorize(line,args[2],cl.Y)
+                #colorize out-of-date flag
+                line = colorize(line,'<!>',cl.D)
+                #colorize '[installed]' flag
+                line = colorize(line,'[installed]',cl.G)
+                if lnctr % 2 == 0: #this is the package line
+                    #fetch package name
+                    pkgnames.append(origline.split(' ')[0])
+                    print cl.B+"["+str(num)+"]"+cl.D,
+                    print line,
+                    num=num+1
+                else: # this is the description
+                    indent = len(str(num))+3
+                    for ln in textwrap.wrap(line, int(columns)-indent):
+                        #print each wrapped line, with dynamic whitespaces
+                        print ' '*indent + ln
+                lnctr=lnctr+1
 
-        if lnctr == 0:
-            #no packages found
-            exit(1)
+            if lnctr == 0:
+                #no packages found
+                exit(1)
 
-        ilist = None
-        while ilist is None:
-            try:
-                ilist=parse(raw_input(":: Packagenumber(s): "));
-                #range check TODO
-            except KeyboardInterrupt:
-                user_abort()
-            except:
-                pass
+            ilist = None
+            while ilist is None:
+                try:
+                    ilist=parse(raw_input(":: Packagenumber(s): "));
+                    #range check TODO
+                except KeyboardInterrupt:
+                    user_abort()
+                except:
+                    pass
 
-        inargs=raw_input(":: Pacaur arguments [-S]: ")
-        if len(inargs)==0:
-            inargs='-S'
+            inargs=raw_input(":: Pacaur arguments [-S]: ")
+            if len(inargs)==0:
+                inargs='-S'
 
-        argpkgnames=''
-        for i in ilist:
-            #workaround: remove repository identifiers, since
-            #pacaur does not always understand them
-            argpkgnames = pkgnames[i].split("/")[1]+' '
+            argpkgnames=''
+            for i in ilist:
+                #workaround: remove repository identifiers, since
+                #pacaur does not always understand them
+                argpkgnames = pkgnames[i].split("/")[1]+' '
 
-            #argpkgnames += pkgnames[i]+' '
+                #argpkgnames += pkgnames[i]+' '
 
-        newargs=['pacaur',inargs, argpkgnames.strip()]
-        p = Popen(newargs,bufsize=1)
-        p.wait()
+            newargs=['pacaur',inargs, argpkgnames.strip()]
+            p = Popen(newargs,bufsize=1)
+            p.wait()
 
-    elif len(args)>1 and (args[1] == '--help' or args[1] == '-h'):
-        print '########pacaur-wrapper help########'
-        print 'usage: use the same arguments as in pacaur'
-        print 'overlayed operations:'
-        print '   -Ss              sync and search in  repositories'
-        print '                    inputs after search:'
-        print '                        -packagenumber0'
-        print '                            non-negative numbers: 1'
-        print '                            comma-seperated numbers: 1,3,7'
-        print '                            ranges: 2-7'
-        print '                        -pacaur arguments, default -S'
-        print '                            see pacaur-help below'
+        elif len(args)>1 and (args[1] == '--help' or args[1] == '-h'):
+            print '########pacaur-wrapper help########'
+            print 'usage: use the same arguments as in pacaur'
+            print 'overlayed operations:'
+            print '   -Ss              sync and search in  repositories'
+            print '                    inputs after search:'
+            print '                        -packagenumber0'
+            print '                            non-negative numbers: 1'
+            print '                            comma-seperated numbers: 1,3,7'
+            print '                            ranges: 2-7'
+            print '                        -pacaur arguments, default -S'
+            print '                            see pacaur-help below'
 
-        print '############pacaur help############'
-        p = Popen(args,bufsize=1)
-        p.wait()
-    else:
-        #simply pass arguments to pacaur:
-        p = Popen(args,bufsize=1)
-        p.wait()
-except KeyboardInterrupt:
-    user_abort()
+            print '############pacaur help############'
+            p = Popen(args,bufsize=1)
+            p.wait()
+        else:
+            #simply pass arguments to pacaur:
+            p = Popen(args,bufsize=1)
+            p.wait()
+    except KeyboardInterrupt:
+        user_abort()
+if __name__ == "__main__":
+        main()
