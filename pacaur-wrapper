@@ -26,7 +26,7 @@ try:
     args = sys.argv
     args[0]='pacaur'
     pkgnames=[]
-    if len(args)>1 and args[1]=="-Ss":
+    if len(args)>2 and args[1]=="-Ss":
         #wrap around pacaur
 
         p = Popen(args,stdin=PIPE, stdout=PIPE, bufsize=1)
