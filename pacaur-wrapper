@@ -4,9 +4,10 @@ import sys, re, os
 import textwrap
 class cl:
     D = '\033[0m' #default color
-    R = '\033[91m' #red
-    Y = '\033[93m' #yellow
-    B = '\033[94m' #blue
+    R = '\033[91m' #light red
+    G = '\033[92m' #light green
+    Y = '\033[93m' #light yellow
+    B = '\033[94m' #light blue
 
 #colorizes the substring in string with color color
 #the search is case-insensitive
@@ -38,6 +39,8 @@ try:
             line = colorize(line,args[2],cl.Y)
             #colorize out-of-date flag
             line = colorize(line,'<!>',cl.D)
+            #colorize '[installed]' flag
+            line = colorize(line,'[installed]',cl.G)
             if lnctr % 2 == 0: #this is the package line
                 #fetch package name
                 pkgnames.append(origline.split(' ')[0])

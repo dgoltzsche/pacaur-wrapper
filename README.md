@@ -4,7 +4,7 @@ pacaur-wrapper is a python-wrapper for [pacaur](https://github.com/Spyhawk/pacau
 
 **Features**
 * 	numbering of packages for direct installation with `-Ss` option
-*	colorful highlighting: search term and out-of-date-flag
+*	colorful highlighting of search term, out-of-date- and installed-flag
 
 **Usage**
 *	use the same options as in pacman and pacaur
