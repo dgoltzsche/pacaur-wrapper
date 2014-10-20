@@ -57,19 +57,26 @@ def main():
             for line in p.stdout:
                 line = line.lstrip()
                 origline=line #backup line
-                #colorize search term, case insensitive
-                line = colorize(line,args[2],cl.Y)
                 #colorize out-of-date flag
                 line = colorize(line,'<!>',cl.D)
                 #colorize '[installed]' flag
                 line = colorize(line,'[installed]',cl.G)
+                line = colorize(line,'[Installiert]',cl.G)
                 if lnctr % 2 == 0: #this is the package line
                     #fetch package name
-                    pkgnames.append(origline.split(' ')[0])
+                    packageName=origline.split(' ')[0]
+                    slashPos=packageName.rfind("/")
+                    packageBaseName=packageName[slashPos+1:]
+                    line = colorize(line,packageBaseName,cl.R)
+                    pkgnames.append(packageName)
                     print cl.B+"["+str(num)+"]"+cl.D,
+                    #colorize search term, case insensitive
+                    line = colorize(line,args[2],cl.Y)
                     print line,
                     num=num+1
                 else: # this is the description
+                    #colorize search term, case insensitive
+                    line = colorize(line,args[2],cl.Y)
                     indent = len(str(num))+3
                     for ln in textwrap.wrap(line, int(columns)-indent):
                         #print each wrapped line, with dynamic whitespaces
