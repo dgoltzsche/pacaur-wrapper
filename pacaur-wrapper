@@ -42,6 +42,11 @@ def colorize(string,sub,color):
         string = string[:index+length] + cl.D + string[index+length:]
     return string
 
+def get_orphans():
+    args = ['pacaur','-Qtdq']
+    output = Popen(args,bufsize=1, stdout=PIPE).communicate()[0]
+    return output.split('\n')
+
 def main():
     try:
         rows, columns = os.popen('stty size', 'r').read().split()
@@ -112,7 +117,18 @@ def main():
             newargs=['pacaur',inargs, argpkgnames.strip()]
             p = Popen(newargs,bufsize=1)
             p.wait()
-
+        elif len(args)>1 and (args[1] == '--autoremove' or args[1] == '-a'):
+            while(1):
+                orphans = get_orphans()
+                if(len(orphans) - 1 == 0):
+                    print '0 orphans found'
+                    exit(0)
+                else:
+                    print str(len(orphans)-1) + ' orphan(s) found'
+                args = ['pacaur','-R']
+                args.extend(orphans)
+                p = Popen(args,bufsize=1)
+                p.wait()
         elif len(args)>1 and (args[1] == '--help' or args[1] == '-h'):
             print '########pacaur-wrapper help########'
             print 'usage: use the same arguments as in pacaur'
@@ -125,7 +141,8 @@ def main():
             print '                            ranges: 2-7'
             print '                        -pacaur arguments, default -S'
             print '                            see pacaur-help below'
-
+            print 'additional operations:'
+            print '   -a --autoremove  recursively remove orphans'
             print '############pacaur help############'
             p = Popen(args,bufsize=1)
             p.wait()
