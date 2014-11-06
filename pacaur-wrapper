@@ -124,7 +124,8 @@ def main():
                     print '0 orphans found'
                     exit(0)
                 else:
-                    print str(len(orphans)-1) + ' orphan(s) found'
+                    print str(len(orphans)-1) + ' orphan(s) found:'
+                    print '\t' + '\n\t'.join(orphans)
                 args = ['pacaur','-R']
                 args.extend(orphans)
                 p = Popen(args,bufsize=1)
