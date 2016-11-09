@@ -96,12 +96,23 @@ def main():
             while ilist is None:
                 try:
                     ilist=parse(raw_input(":: Packagenumber(s): "));
-                    #range check TODO
+                    #range check
+                    ilist = list(set(ilist))
+		    #print ilist
+		    errlist = [] 
+		    for i in ilist:
+		        if (i < 0) or (i > num-1):
+			    errlist.append(i)
+		    if len(errlist):
+                        print ":: Invalid Packagenumber(s): ",
+                        print errlist
+		        errlist = None
+		        ilist = None
                 except KeyboardInterrupt:
                     user_abort()
                 except:
                     pass
-
+            
             inargs=raw_input(":: Pacaur arguments [-S]: ")
             if len(inargs)==0:
                 inargs='-S'
