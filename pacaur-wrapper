@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 from subprocess import Popen, PIPE
 import sys, re, os
 import textwrap
@@ -11,7 +11,7 @@ class cl:
 
 #is called on user abort
 def user_abort():
-    print "\nuser interrupt"
+    print("\nuser interrupt")
     exit(0);
 
 #parses the input string for numbers
@@ -21,11 +21,11 @@ def parse(string):
         #try range
         a,b = re.match('^[0-9]+-[0-9]+$',string).group().split('-')
         ret = []
-        integerlist = range(int(a),int(b)+1)
+        integerlist = list(range(int(a),int(b)+1))
     else:
         #try comma seperated list (special case: one integer)
         stringlist = re.match('^([0-9]+(,[0-9]+)*)?$',string).group().split(',')
-        integerlist = map(int,stringlist)
+        integerlist = list(map(int,stringlist))
 
     return integerlist
 
@@ -74,10 +74,10 @@ def main():
                     packageBaseName=packageName[slashPos+1:]
                     line = colorize(line,packageBaseName,cl.R)
                     pkgnames.append(packageName)
-                    print cl.B+"["+str(num)+"]"+cl.D,
+                    print(cl.B+"["+str(num)+"]"+cl.D, end=' ')
                     #colorize search term, case insensitive
                     line = colorize(line,args[2],cl.Y)
-                    print line,
+                    print(line, end=' ')
                     num=num+1
                 else: # this is the description
                     #colorize search term, case insensitive
@@ -85,7 +85,7 @@ def main():
                     indent = len(str(num))+3
                     for ln in textwrap.wrap(line, int(columns)-indent):
                         #print each wrapped line, with dynamic whitespaces
-                        print ' '*indent + ln
+                        print(' '*indent + ln)
                 lnctr=lnctr+1
 
             if lnctr == 0:
@@ -95,14 +95,14 @@ def main():
             ilist = None
             while ilist is None:
                 try:
-                    ilist=parse(raw_input(":: Packagenumber(s): "));
+                    ilist=parse(input(":: Packagenumber(s): "));
                     #range check TODO
                 except KeyboardInterrupt:
                     user_abort()
                 except:
                     pass
 
-            inargs=raw_input(":: Pacaur arguments [-S]: ")
+            inargs=input(":: Pacaur arguments [-S]: ")
             if len(inargs)==0:
                 inargs='-S'
 
@@ -121,30 +121,30 @@ def main():
             while(1):
                 orphans = get_orphans()
                 if(len(orphans) - 1 == 0):
-                    print '0 orphans found'
+                    print('0 orphans found')
                     exit(0)
                 else:
-                    print str(len(orphans)-1) + ' orphan(s) found:'
-                    print '\t' + '\n\t'.join(orphans)
+                    print(str(len(orphans)-1) + ' orphan(s) found:')
+                    print('\t' + '\n\t'.join(orphans))
                 args = ['pacaur','-R']
                 args.extend(orphans)
                 p = Popen(args,bufsize=1)
                 p.wait()
         elif len(args)>1 and (args[1] == '--help' or args[1] == '-h'):
-            print '########pacaur-wrapper help########'
-            print 'usage: use the same arguments as in pacaur'
-            print 'overlayed operations:'
-            print '   -Ss              sync and search in  repositories'
-            print '                    inputs after search:'
-            print '                        -packagenumber0'
-            print '                            non-negative numbers: 1'
-            print '                            comma-seperated numbers: 1,3,7'
-            print '                            ranges: 2-7'
-            print '                        -pacaur arguments, default -S'
-            print '                            see pacaur-help below'
-            print 'additional operations:'
-            print '   -a --autoremove  recursively remove orphans'
-            print '############pacaur help############'
+            print('########pacaur-wrapper help########')
+            print('usage: use the same arguments as in pacaur')
+            print('overlayed operations:')
+            print('   -Ss              sync and search in  repositories')
+            print('                    inputs after search:')
+            print('                        -packagenumber0')
+            print('                            non-negative numbers: 1')
+            print('                            comma-seperated numbers: 1,3,7')
+            print('                            ranges: 2-7')
+            print('                        -pacaur arguments, default -S')
+            print('                            see pacaur-help below')
+            print('additional operations:')
+            print('   -a --autoremove  recursively remove orphans')
+            print('############pacaur help############')
             p = Popen(args,bufsize=1)
             p.wait()
         else:
